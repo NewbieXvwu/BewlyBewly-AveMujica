@@ -13,7 +13,14 @@ import { compareVersions, injectCSS, isHomePage, isInIframe, isNotificationPage,
 import { SVG_ICONS } from '~/utils/svgIcons'
 
 import { version } from '../../package.json'
+import { setupFrameFetchResponder, setupPageFetchListener } from './pageFetch'
 import App from './views/App.vue'
+
+// Relay API requests through the page context on browsers without a usable
+// `declarativeNetRequest`, on every matched frame rather than only the ones the
+// UI is mounted in. See `pageFetch.ts`.
+setupPageFetchListener()
+setupFrameFetchResponder()
 
 const isFirefox: boolean = /Firefox/i.test(navigator.userAgent)
 

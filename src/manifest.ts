@@ -60,6 +60,9 @@ export async function getManifest() {
           '*://passport.bilibili.com/*',
           '*://music.bilibili.com/*',
           '*://live.bilibili.com/p/html/live-fansmedal-wall/*',
+          // Only used as the origin for the API relay frame in
+          // `src/contentScripts/pageFetch.ts`; the UI is not mounted there.
+          '*://app.bilibili.com/*',
         ],
         js: ['./dist/contentScripts/index.global.js'],
         css: ['./dist/contentScripts/style.css'],

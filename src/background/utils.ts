@@ -3,6 +3,9 @@
 // 2. json化后返回data
 
 import type Browser from 'webextension-polyfill'
+import browser from 'webextension-polyfill'
+
+import { sendRequest } from './pageRelay'
 
 type FetchAfterHandler = ((data: Response) => Promise<any>) | ((data: any) => any)
 
@@ -72,14 +75,14 @@ function apiListenerFactory(API_MAP: APIMAP) {
     // eslint-disable-next-line node/prefer-global/process
     if (process.env.FIREFOX && sender && sender.tab && sender.tab.cookieStoreId) {
       const cookies = await browser.cookies.getAll({ storeId: sender.tab.cookieStoreId })
-      return doRequest(message, api, sendResponse, cookies)
+      return doRequest(message, api, sendResponse, cookies, sender)
     }
 
-    return doRequest(message, api, sendResponse)
+    return doRequest(message, api, sendResponse, undefined, sender)
   }
 }
 
-function doRequest(message: Message, api: API, sendResponse?: Function, cookies?: Browser.Cookies.Cookie[]) {
+function doRequest(message: Message, api: API, sendResponse?: Function, cookies?: Browser.Cookies.Cookie[], sender?: Browser.Runtime.MessageSender) {
   try {
     let { contentScriptQuery, ...rest } = message
     // rest above two part body or params
@@ -120,9 +123,7 @@ function doRequest(message: Message, api: API, sendResponse?: Function, cookies?
     const fetchOpt = { method, headers }
     !isGET && Object.assign(fetchOpt, { body: targetBody })
     // fetch and after handle
-    let baseFunc = fetch(url, {
-      ...fetchOpt,
-    })
+    let baseFunc = sendRequest(url, fetchOpt, sender)
     afterHandle.forEach((func) => {
       if (func.name === sendResponseHandler.name && sendResponse)
         // sendResponseHandler 是一个特殊的后处理函数，需要传入sendResponse
