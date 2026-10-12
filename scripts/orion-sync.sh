@@ -37,7 +37,7 @@ echo "==> 拉取上游 ..."
 git fetch origin --tags --prune
 
 if git merge-base --is-ancestor "$UPSTREAM_REF" "$BRANCH"; then
-  echo "==> $BRANCH 已包含 $UPSTREAM_REF，无需同步"
+  echo "==> ${BRANCH} 已包含 ${UPSTREAM_REF}，无需同步"
 else
   echo "==> 上游新增提交："
   git log --oneline --no-decorate "$BRANCH".."$UPSTREAM_REF" | head -30
