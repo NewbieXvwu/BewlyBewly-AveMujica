@@ -2,6 +2,10 @@
 #
 # 把 Orion 适配层重新贴到最新的上游 main 上。
 #
+# 远程
+#   upstream —— VentusUta/BewlyBewly-AveMujica，实际上游，只读
+#   origin   —— 自己的 fork，用来备份 orion 分支
+#
 # 分支模型
 #   main   —— 上游的纯净镜像，永远不在这里提交任何东西
 #   orion  —— main + 我们的适配提交，本脚本 rebase 的就是它
@@ -23,7 +27,7 @@
 set -euo pipefail
 
 BRANCH=orion
-UPSTREAM_REF=origin/main
+UPSTREAM_REF=upstream/main
 
 cd "$(dirname "$0")/.."
 
@@ -34,7 +38,7 @@ if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
 fi
 
 echo "==> 拉取上游 ..."
-git fetch origin --tags --prune
+git fetch upstream --tags --prune
 
 if git merge-base --is-ancestor "$UPSTREAM_REF" "$BRANCH"; then
   echo "==> ${BRANCH} 已包含 ${UPSTREAM_REF}，无需同步"
